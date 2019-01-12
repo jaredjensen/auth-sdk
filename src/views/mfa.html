@@ -1,0 +1,6 @@
+<div class="auth-sdk-step auth-sdk-mfa">
+  <p>Select an option to complete your sign-in securely:</p>
+  {{~it.options :o}}
+  <button type="button" class="auth-sdk-button"  auth-sdk-trigger='{ "action": "MFA", "type": "{{=o}}" }'>{{=o}}</button>
+  {{~}}
+</div>

@@ -1,0 +1,26 @@
+#auth-sdk-target {
+  background: #eee;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 1rem;
+}
+
+.auth-sdk-input-group {
+  margin-bottom: 1rem;
+}
+
+.auth-sdk-input {
+  display: block;
+  width: 100%;
+}
+
+.auth-sdk-button {
+  display: block;
+  margin-top: 1rem;
+}
+
+@media (min-width: 768px) {
+  #auth-sdk-target {
+    width: 400px;
+  }
+}

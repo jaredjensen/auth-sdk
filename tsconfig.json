@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "lib": ["es5", "es6", "dom"],
+    "module": "commonjs",
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "paths": {},
+    "sourceMap": true,
+    "target": "es5"
+  },
+  "include": ["./src/**/*"]
+}
