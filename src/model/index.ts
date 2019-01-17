@@ -1,9 +1,16 @@
-export interface Step<T> {
-  config?: T;
-  type: StepType;
+export interface Step {
+  id: string;
+  type: StepTypeName;
 }
 
-export enum StepType {
+export interface UsernamePasswordStep extends Step {
+  password: string;
+  username: string;
+}
+
+export type StepType = UsernamePasswordStep;
+
+export enum StepTypeName {
   UsernamePassword = 'UsernamePassword',
   MFA = 'MFA',
 }

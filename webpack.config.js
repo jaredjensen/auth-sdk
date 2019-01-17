@@ -30,7 +30,7 @@ const plugins = [
 const config = {
   devServer: {
     compress: true,
-    contentBase: path.join(__dirname, 'sample'),
+    contentBase: path.join(__dirname, 'customer'),
     port: 9000,
   },
   devtool: 'source-map',

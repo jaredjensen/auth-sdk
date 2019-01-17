@@ -1,15 +1,17 @@
-import * as dot from 'dot';
-import steps from './data';
-import { MfaType, Step, StepType } from './model';
-import * as mfaTemplate from './views/mfa.html';
-import * as usernamePasswordTemplate from './views/username-password.html';
+import { MfaType, Step } from './model';
+import { getNextStep } from './services/auth-tree';
+import { renderStep } from './services/render';
 
+const FLOW_NAME = 'UsernamePassword';
 const TARGET_ID = 'auth-sdk-target';
-let target: HTMLElement = null;
-let stepIndex = 0;
+const TRIGGER_ATTR_NAME = 'auth-sdk-trigger';
 
-const init = () => {
+let target: HTMLElement = null;
+let step: Step = undefined;
+
+const init = async () => {
   target = document.getElementById(TARGET_ID);
+
   if (!target) {
     console.warn(`Missing auth-sdk target "${TARGET_ID}"`);
     return;
@@ -17,22 +19,31 @@ const init = () => {
 
   document.addEventListener('click', onClick);
 
-  const step = getStep(stepIndex);
-  renderStep(step);
+  nextStep();
 };
 
-const nextStep = () => {
-  stepIndex++;
-  const step = getStep(stepIndex);
-  renderStep(step);
+const nextStep = async () => {
+  try {
+    step = await getNextStep(FLOW_NAME, step);
+    const html = renderStep(step);
+    updateDom(html);
+  } catch (err) {
+    console.error(err);
+    updateDom(`<p>${err.message}</p>`);
+  }
+};
+
+const updateDom = (html: string) => {
+  target.innerHTML = html;
 };
 
 const onClick = (e: MouseEvent) => {
-  if (!e.srcElement.hasAttribute('auth-sdk-trigger')) {
+  const triggerAttribute = e.srcElement.attributes.getNamedItem(TRIGGER_ATTR_NAME);
+  if (!triggerAttribute) {
     return;
   }
 
-  const trigger = JSON.parse(e.srcElement.attributes.getNamedItem('auth-sdk-trigger').value);
+  const trigger = JSON.parse(triggerAttribute.value);
   switch (trigger.action) {
     case 'COLLECT':
       return collectInput();
@@ -92,26 +103,26 @@ const mfa = (type: MfaType) => {
   }
 };
 
-const getStep = (index: number): Step<{}> => {
-  return steps[index]; // this would come from the gateway
-};
+// const getStep = (index: number): Step<{}> => {
+//   return steps[index]; // this would come from the gateway
+// };
 
-const renderStep = (step: Step<{}>) => {
-  const html = getStepHtml(step.type);
-  const fn = dot.template(html);
-  target.innerHTML = fn(step.config);
-};
+// const renderStep = (step: Step<{}>) => {
+//   const html = getStepHtml(step.type);
+//   const fn = dot.template(html);
+//   target.innerHTML = fn(step.config);
+// };
 
-const getStepHtml = (stepType: StepType) => {
-  switch (stepType) {
-    case StepType.UsernamePassword:
-      return usernamePasswordTemplate;
-    case StepType.MFA:
-      return mfaTemplate;
-    default:
-      return `Missing template for type "${stepType}"`;
-  }
-};
+// const getStepHtml = (stepType: StepType) => {
+//   switch (stepType) {
+//     case StepType.UsernamePassword:
+//       return usernamePasswordTemplate;
+//     case StepType.MFA:
+//       return mfaTemplate;
+//     default:
+//       return `Missing template for type "${stepType}"`;
+//   }
+// };
 
 const generateKey = (length: number) => {
   const key = new Uint8Array(length);
